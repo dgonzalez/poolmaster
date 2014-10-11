@@ -6,3 +6,6 @@ class Player(User):
 class Match(models.Model):
     player_one = models.ForeignKey(Player, related_name='%(class)s_player1')
     player_two = models.ForeignKey(Player, related_name='%(class)s_player2')
+
+class Event(models.Model):
+    event_name = models.CharField(max_length = 100)

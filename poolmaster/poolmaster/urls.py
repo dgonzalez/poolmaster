@@ -1,32 +1,37 @@
 from django.conf.urls import url, include
-from django.contrib.auth.models import User
 from django.contrib import admin
 from rest_framework import routers, serializers, viewsets
 
-from tournaments.models import Match, Event
+from tournaments.models import Match, Event, Player, Department
 
 # Serializers define the API representation.
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ('url', 'username', 'email', 'is_staff')
+        model = Player
+        fields = ('name', 'id', 'department')
 
-class MatchSerializer(serializers.HyperlinkedModelSerializer):
-    player_one = serializers.RelatedField(many=False)
-    player_two = serializers.RelatedField(many=False)
+class MatchSerializer(serializers.ModelSerializer):
+    player_one = serializers.PrimaryKeyRelatedField(many=False, read_only=False)
+    player_two = serializers.PrimaryKeyRelatedField(many=False, read_only=False)
+
     class Meta:
         model = Match
         fields = ('player_one', 'player_two')
 
-class EventSerializer(serializers.HyperlinkedModelSerializer):
+class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ('event_name',)
 
+class DepartmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Department
+        fields = ('name',)
+
 # ViewSets define the view behavior.
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+class PlayerViewSet(viewsets.ModelViewSet):
+    queryset = Player.objects.all()
+    serializer_class = PlayerSerializer
 
 class MatchViewSet(viewsets.ModelViewSet):
     queryset = Match.objects.all()
@@ -36,17 +41,23 @@ class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
 
+class DepartmentViewSet(viewsets.ModelViewSet):
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
+
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
+router.register(r'players', PlayerViewSet)
 router.register(r'matches', MatchViewSet)
 router.register(r'events', EventViewSet)
+router.register(r'departments', DepartmentViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browseable API.
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^', include(router.urls)),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api-token-auth/', 'rest_framework.authtoken.views.obtain_auth_token')
 ]
 

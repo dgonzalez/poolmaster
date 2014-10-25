@@ -11,12 +11,18 @@ class PlayerSerializer(serializers.ModelSerializer):
         fields = ('name', 'id', 'department')
 
 class MatchSerializer(serializers.ModelSerializer):
-    player_one = serializers.PrimaryKeyRelatedField(many=False, read_only=False)
-    player_two = serializers.PrimaryKeyRelatedField(many=False, read_only=False)
-
     class Meta:
         model = Match
-        fields = ('player_one', 'player_two')
+        fields = ('player_one', 'player_two', 'winner')
+        depth = 0
+
+class AllMatchesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Match
+        fields = ('player_one', 'player_two', 'winner')
+        read_only = ('player_one', 'player_two', 'winner') 
+        depth = 2
+
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,6 +43,10 @@ class MatchViewSet(viewsets.ModelViewSet):
     queryset = Match.objects.all()
     serializer_class = MatchSerializer
 
+class AllMatchesViewSet(viewsets.ModelViewSet):
+    queryset = Match.objects.all()
+    serializer_class = AllMatchesSerializer
+
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
@@ -49,6 +59,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
 router = routers.DefaultRouter()
 router.register(r'players', PlayerViewSet)
 router.register(r'matches', MatchViewSet)
+router.register(r'allmatches', AllMatchesViewSet)
 router.register(r'events', EventViewSet)
 router.register(r'departments', DepartmentViewSet)
 

@@ -1,3 +1,20 @@
 <div>
-  Hola soy test
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Player One</th>
+                <th>Player Two</th>
+                <th>Match Result</th>
+                <th>Winner Department</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="match in matches">
+                <td>{{match.player_one.name}}</td>
+                <td>{{match.player_two.name}}</td>
+                <td>{{match.winner.name}}</td>
+                <td>{{match.winner.department.name}}</td>
+            </tr>
+        </tbody>
+    </table>
 </div>
